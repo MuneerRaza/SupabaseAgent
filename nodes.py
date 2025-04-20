@@ -32,7 +32,6 @@ def rewrite_prompt_node(state: AgentState) -> AgentState:
         "You are an expert prompt engineer. Rewrite the following user request "
         "into a clear, structured command. Focus on the core task "
         "and necessary details. Identify entities, actions, and constraints. "
-        "If there is request to add any r"
         "If it involves files, mention them clearly. "
         "Output only the refined prompt. not any query or SQL. "
         "Donot include any explanations and DONOT INCLUDE ANY FALSE OR EXTRA INFORMATION, just the rewritten prompt."
@@ -121,12 +120,9 @@ def sql_exec_node(state: AgentState) -> AgentState:
             return state
 
         system_prompt = (
-            "You are an expert SQL generator. Based on the user request and the database schema, generate a *single*, runnable SQL query for PostgreSQL.\n"
-            "IMPORTANT RULES:\n"
-            "1. ONLY output the SQL query, with no explanations, comments, or markdown formatting (like ```sql).\n"
-            "2. **For INSERT statements: Do NOT include columns that are 'auto-generated' or have database 'defaults' (like 'id', 'created_at') in the column list or VALUES.** Let the database handle them.\n"
-            "3. If the user prompt is missing values for required columns that do NOT have defaults (check schema), ask for clarification using 'QUERY_AMBIGUOUS: [Specify missing information]'. Do not guess values for required columns.\n"
-            "4. If the request cannot be translated to SQL, return 'QUERY_NOT_SQL'.\n"
+            "You are an expert SQL generator. Based on the user request and the database schema, generate a *single*, runnable SQL query for PostgreSQL. \n"
+            "IMPORTANT: ONLY output the SQL query, with no explanations, comments, or markdown formatting (like ```sql). \n"
+            "If the request cannot be translated to SQL, return 'QUERY_NOT_SQL'.\n"
             f"Database Schema:\n{config.DB_SCHEMA_INFO}\n\n"
             "User Request:"
         )
@@ -479,13 +475,11 @@ def error_handler_node(state: AgentState) -> AgentState:
     logging.warning(f"Attempting to fix SQL query. Attempt {state['sql_retry_count'] + 1}")
 
     system_prompt = (
-        "You are an expert SQL debugger. The following PostgreSQL query failed. Analyze the original user request, the failed query, the error message, and the database schema. Generate a *corrected* SQL query.\n"
-        "IMPORTANT RULES:\n"
-        "1. ONLY output the corrected SQL query, with no explanations or markdown.\n"
-        "2. Pay close attention to errors like 'violates not-null constraint', especially on columns like 'id' or 'created_at'. These are often auto-generated.\n"
-        "3. **If the failed query is an INSERT statement trying to specify 'auto-generated' columns (like 'id', 'created_at'), correct the query by REMOVING these columns from the column list and VALUES.**\n"
-        "4. If the error indicates a missing value for a required column (violates not-null constraint on a column the user *must* provide, like potentially 'age' or 'name' if required), indicate that the query is unfixable without more information using 'QUERY_UNFIXABLE: Missing required value for column [column_name]'.\n"
-        "5. If the error is genuinely unfixable or unclear, return 'QUERY_UNFIXABLE: [Reason]'.\n"
+        "You are an expert SQL debugger. The following SQL query failed with an error. \n"
+        "Analyze the original user request, the failed query, the error message, and the database schema. \n"
+        "Generate a *corrected* SQL query for PostgreSQL to achieve the user's goal. \n"
+        "IMPORTANT: ONLY output the corrected SQL query, with no explanations or markdown.\n"
+        "If the error is unfixable or requires more information, return 'QUERY_UNFIXABLE: [Reason]'.\n"
          f"Database Schema:\n{config.DB_SCHEMA_INFO}\n\n"
          f"Original User Request: {prompt}\n"
          f"Failed SQL Query:\n{original_query}\n\n"
