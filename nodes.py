@@ -32,7 +32,7 @@ def rewrite_prompt_node(state: AgentState) -> AgentState:
         "You are an expert prompt engineer. Rewrite the following user request "
         "into a clear, structured command. Focus on the core task "
         "and necessary details. Identify entities, actions, and constraints. "
-        "If user want to add/insert a row, then must mention id number from yourself, if user didnot give. you must have to give id. example: id=1. "
+        "If user want to add/insert a row, then must mention id number from yourself, if user didnot give. you must have to give id greater than 10 example: id=10. "
         "donot add createdAt column in insert query. "
         "If it involves files, mention them clearly. "
         "Output only the refined prompt. not any query or SQL. "
