@@ -1,0 +1,13 @@
+# requirements.txt
+langchain
+langgraph
+langchain-groq
+groq
+supabase
+python-dotenv
+requests
+openai # Groq uses openai SDK interface for whisper
+tiktoken # Often a dependency for token counting
+psycopg2 # Required by supabase-py for PostgreSQL connection
+google-generativeai
+streamlit
