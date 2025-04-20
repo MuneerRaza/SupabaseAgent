@@ -32,6 +32,8 @@ def rewrite_prompt_node(state: AgentState) -> AgentState:
         "You are an expert prompt engineer. Rewrite the following user request "
         "into a clear, structured command. Focus on the core task "
         "and necessary details. Identify entities, actions, and constraints. "
+        "If user want to add/insert a row, then must mention id number from yourself, if user didnot give. you must have to give id. example: id=1. "
+        "donot add createdAt column in insert query. "
         "If it involves files, mention them clearly. "
         "Output only the refined prompt. not any query or SQL. "
         "Donot include any explanations and DONOT INCLUDE ANY FALSE OR EXTRA INFORMATION, just the rewritten prompt."
@@ -121,7 +123,6 @@ def sql_exec_node(state: AgentState) -> AgentState:
 
         system_prompt = (
             "You are an expert SQL generator. Based on the user request and the database schema, generate a *single*, runnable SQL query for PostgreSQL. \n"
-            "If user want to insert a row, then make sure to add id as well, you can add it yourself, but it shouldn't be null.\n"
             "IMPORTANT: ONLY output the SQL query, with no explanations, comments, or markdown formatting (like ```sql). \n"
             "If the request cannot be translated to SQL, return 'QUERY_NOT_SQL'.\n"
             f"Database Schema:\n{config.DB_SCHEMA_INFO}\n\n"
